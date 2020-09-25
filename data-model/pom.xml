@@ -8,18 +8,6 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <artifactId>database-service</artifactId>
-
-    <dependencies>
-        <dependency>
-            <groupId>ishift.pl</groupId>
-            <artifactId>data-model</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-    </dependencies>
+    <artifactId>data-model</artifactId>
 
 </project>
