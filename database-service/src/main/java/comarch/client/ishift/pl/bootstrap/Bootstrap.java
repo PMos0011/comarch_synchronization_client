@@ -1,4 +1,4 @@
-package comarch.client.ishift.pl.tests;
+package comarch.client.ishift.pl.bootstrap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -33,8 +32,6 @@ public class Bootstrap implements CommandLineRunner {
         this.httpRequestService = httpRequestService;
     }
 
-    private final byte[] AUTH_DATA_BYTE = "{\"userName\":\"admin\",\"password\":\"admin\"}".getBytes();
-
     @Override
     public void run(String... args) throws Exception {
 
@@ -51,7 +48,7 @@ public class Bootstrap implements CommandLineRunner {
                 byte[] data = new ObjectMapper().writeValueAsBytes(transferObject);
 
                 try {
-                    test = (httpRequestService.postRequest(test, data, "http://localhost:8080/test1"));
+                    test = (httpRequestService.sendRequest(test, data, "http://localhost:8080/synchro"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -59,16 +56,13 @@ public class Bootstrap implements CommandLineRunner {
                 e.printStackTrace();
             }
         }
+        httpRequestService.sendRequest(test, "http://localhost:8080/synchro");
 
     }
 
 
     public List<DeclarationData> getData() {
-        System.out.println(dataBasesListSingleton.getDatabasesList().size());
-
-        ClientDatabaseContextHolder.set(dataBasesListSingleton.getDatabasesList().get(0));
         List<DeclarationData> declarationData = declarationDataRepository.findAll();
-        ClientDatabaseContextHolder.clear();
 
         for (DeclarationData decl : declarationData) {
             List<DeclarationDetails> declarationDetails =
@@ -76,11 +70,7 @@ public class Bootstrap implements CommandLineRunner {
                             filter(this::detailFilter).collect(Collectors.toList());
             decl.setDeclarationDetails(declarationDetails);
         }
-
         return declarationData;
-
-        // return new ObjectMapper().writeValueAsString(declarationData);
-        //System.out.println(test);
     }
 
     public boolean detailFilter(DeclarationDetails d) {

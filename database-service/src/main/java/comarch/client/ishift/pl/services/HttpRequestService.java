@@ -5,5 +5,7 @@ import java.net.MalformedURLException;
 
 public interface HttpRequestService {
 
-        String postRequest(String token, byte[] data, String url) throws IOException;
+        String sendRequest(String token, byte[] data, String url) throws IOException;
+
+        String sendRequest(String token, String url) throws IOException;
 }

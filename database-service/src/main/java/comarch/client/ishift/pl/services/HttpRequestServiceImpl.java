@@ -16,13 +16,13 @@ public class HttpRequestServiceImpl implements HttpRequestService {
 
 
     @Override
-    public String postRequest(String authToken, byte[] data, String address) throws IOException {
+    public String sendRequest(String authToken, byte[] data, String address) throws IOException {
 
         Optional<String> optionalToken = Optional.ofNullable(authToken);
 
         authToken = optionalToken.orElseGet(() -> {
             try {
-                HttpURLConnection con = setConnection(AUTH_ADDRESS, null);
+                HttpURLConnection con = setConnection(AUTH_ADDRESS, null, "POST");
                 sendData(con, AUTH_DATA_BYTE);
                 String token = getAuthorizationHeader(con, null);
                 con.disconnect();
@@ -34,22 +34,32 @@ public class HttpRequestServiceImpl implements HttpRequestService {
         });
 
         if (authToken != null) {
-            HttpURLConnection con = setConnection(address, authToken);
+            HttpURLConnection con = setConnection(address, authToken, "POST");
             sendData(con, data);
-            authToken=getAuthorizationHeader(con, authToken);
+            authToken = getAuthorizationHeader(con, authToken);
             con.disconnect();
 
         }
         return authToken;
     }
 
-    private HttpURLConnection setConnection(String address, String authToken) throws IOException {
+    @Override
+    public String sendRequest(String token, String address) throws IOException {
+        if (token != null) {
+            HttpURLConnection con = setConnection(address, token, "GET");
+            token = getAuthorizationHeader(con, token);
+            con.disconnect();
+        }
+        return token;
+    }
+
+    private HttpURLConnection setConnection(String address, String authToken, String method) throws IOException {
 
         Optional<String> authHeader = Optional.ofNullable(authToken);
 
         URL url = new URL(address);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
+        con.setRequestMethod(method);
         con.setRequestProperty("Content-Type", "application/json; utf-8");
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
@@ -68,7 +78,8 @@ public class HttpRequestServiceImpl implements HttpRequestService {
 
         if (con.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED)
             return con.getHeaderFields().get("Authorization").get(0);
-        else if (con.getResponseCode() == HttpURLConnection.HTTP_CREATED)
+        else if (con.getResponseCode() == HttpURLConnection.HTTP_CREATED
+                || con.getResponseCode() == HttpURLConnection.HTTP_OK)
             return token;
         else
             return null;
