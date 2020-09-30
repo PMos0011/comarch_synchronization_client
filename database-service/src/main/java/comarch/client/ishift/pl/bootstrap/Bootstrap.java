@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import comarch.client.ishift.pl.configurations.ClientDatabaseContextHolder;
 import comarch.client.ishift.pl.data.DataBasesListSingleton;
+import comarch.client.ishift.pl.model.CompanyData;
 import comarch.client.ishift.pl.model.DeclarationData;
 import comarch.client.ishift.pl.model.DeclarationDetails;
 import comarch.client.ishift.pl.model.TransferObject;
+import comarch.client.ishift.pl.repository.CompanyDataRepository;
 import comarch.client.ishift.pl.repository.DeclarationDataRepository;
 import comarch.client.ishift.pl.services.HttpRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,16 @@ public class Bootstrap implements CommandLineRunner {
     private final DataBasesListSingleton dataBasesListSingleton;
     private final DeclarationDataRepository declarationDataRepository;
     private final HttpRequestService httpRequestService;
+    private final CompanyDataRepository companyDataRepository;
 
     @Autowired
-    public Bootstrap(DeclarationDataRepository declarationDataRepository, HttpRequestService httpRequestService) {
+    public Bootstrap(DeclarationDataRepository declarationDataRepository,
+                     HttpRequestService httpRequestService,
+                     CompanyDataRepository companyDataRepository) {
         this.dataBasesListSingleton = DataBasesListSingleton.getInstance(null);
         this.declarationDataRepository = declarationDataRepository;
         this.httpRequestService = httpRequestService;
+        this.companyDataRepository = companyDataRepository;
     }
 
     @Override
@@ -38,10 +44,9 @@ public class Bootstrap implements CommandLineRunner {
         String test = null;
 
         for (String dbName : dataBasesListSingleton.getDatabasesList()) {
-
             ClientDatabaseContextHolder.set(dbName);
-            System.out.println(dbName);
-            TransferObject transferObject = new TransferObject(dbName, getData());
+            CompanyData companyData = companyDataRepository.getCompanyName();
+            TransferObject transferObject = new TransferObject(dbName, companyData.getCompanyData(), getData());
             ClientDatabaseContextHolder.clear();
 
             try {
@@ -66,8 +71,11 @@ public class Bootstrap implements CommandLineRunner {
 
         for (DeclarationData decl : declarationData) {
             List<DeclarationDetails> declarationDetails =
-                    decl.getDeclarationDetails().stream().
-                            filter(this::detailFilter).collect(Collectors.toList());
+                    decl.getDeclarationDetails().stream()
+                            .filter(this::detailFilter)
+                            .filter(d -> d.getValue().length() > 3)
+                            .filter(this::hasDotFilter)
+                            .collect(Collectors.toList());
             decl.setDeclarationDetails(declarationDetails);
         }
         return declarationData;
@@ -85,4 +93,16 @@ public class Bootstrap implements CommandLineRunner {
             return false;
         }
     }
+
+    public boolean hasDotFilter(DeclarationDetails d) {
+
+        try {
+            Character a = d.getValue().charAt(d.getValue().length() - 3);
+            return a.equals('.');
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
