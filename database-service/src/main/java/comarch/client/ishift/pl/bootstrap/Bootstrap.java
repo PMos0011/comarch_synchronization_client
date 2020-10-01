@@ -75,6 +75,8 @@ public class Bootstrap implements CommandLineRunner {
                             .filter(this::detailFilter)
                             .filter(d -> d.getValue().length() > 3)
                             .filter(this::hasDotFilter)
+                            .filter(d->!d.getDescription().contains("Stawka "))
+                            .filter(d->!d.getDescription().contains("Rodzaj płatnika"))
                             .collect(Collectors.toList());
             decl.setDeclarationDetails(declarationDetails);
         }
