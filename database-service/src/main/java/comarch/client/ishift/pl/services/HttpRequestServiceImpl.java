@@ -11,8 +11,11 @@ import java.util.Optional;
 @Service
 public class HttpRequestServiceImpl implements HttpRequestService {
 
-    private final byte[] AUTH_DATA_BYTE = "{\"userName\":\"admin\",\"password\":\"admin\"}".getBytes();
-    private final String AUTH_ADDRESS = "http://localhost:8080/login";
+    public final static String SERVER_ADDRESS = "http://localhost:8080";
+    //public final static String SERVER_ADDRESS = "https://ishift.pl:8080";
+
+    private final byte[] AUTH_DATA_BYTE = "{\"userName\":\"mb\",\"password\":\"mbmbmbmb\"}".getBytes();
+
 
 
     @Override
@@ -22,7 +25,7 @@ public class HttpRequestServiceImpl implements HttpRequestService {
 
         authToken = optionalToken.orElseGet(() -> {
             try {
-                HttpURLConnection con = setConnection(AUTH_ADDRESS, null, "POST");
+                HttpURLConnection con = setConnection("/login", null, "POST");
                 sendData(con, AUTH_DATA_BYTE);
                 String token = getAuthorizationHeader(con, null);
                 con.disconnect();
@@ -57,7 +60,7 @@ public class HttpRequestServiceImpl implements HttpRequestService {
 
         Optional<String> authHeader = Optional.ofNullable(authToken);
 
-        URL url = new URL(address);
+        URL url = new URL(SERVER_ADDRESS + address);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod(method);
         con.setRequestProperty("Content-Type", "application/json; utf-8");

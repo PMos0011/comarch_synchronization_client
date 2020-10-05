@@ -11,6 +11,7 @@ import comarch.client.ishift.pl.model.TransferObject;
 import comarch.client.ishift.pl.repository.CompanyDataRepository;
 import comarch.client.ishift.pl.repository.DeclarationDataRepository;
 import comarch.client.ishift.pl.services.HttpRequestService;
+import comarch.client.ishift.pl.services.HttpRequestServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -45,15 +46,24 @@ public class Bootstrap implements CommandLineRunner {
 
         for (String dbName : dataBasesListSingleton.getDatabasesList()) {
             ClientDatabaseContextHolder.set(dbName);
-            CompanyData companyData = companyDataRepository.getCompanyName();
-            TransferObject transferObject = new TransferObject(dbName, companyData.getCompanyData(), getData());
+            CompanyData companyName = companyDataRepository.getCompanyName();
+            List<CompanyData> companyData = companyDataRepository.getCompanyData();
+            CompanyData companyREGON = companyDataRepository.getCompanyREGON();
+            TransferObject transferObject = new TransferObject(
+                    dbName.toLowerCase(),
+                    companyName.getCompanyData(),
+                    args[1],
+                    args[2],
+                    companyREGON.getCompanyData(),
+                    getData(),
+                    companyData);
             ClientDatabaseContextHolder.clear();
 
             try {
                 byte[] data = new ObjectMapper().writeValueAsBytes(transferObject);
 
                 try {
-                    test = (httpRequestService.sendRequest(test, data, "http://localhost:8080/synchro"));
+                    test = (httpRequestService.sendRequest(test, data, "/synchro"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -61,13 +71,13 @@ public class Bootstrap implements CommandLineRunner {
                 e.printStackTrace();
             }
         }
-        httpRequestService.sendRequest(test, "http://localhost:8080/synchro");
+        httpRequestService.sendRequest(test, "/synchro");
 
     }
 
 
     public List<DeclarationData> getData() {
-        List<DeclarationData> declarationData = declarationDataRepository.findAll();
+        List<DeclarationData> declarationData = declarationDataRepository.findAllSupportedDeclarations();
 
         for (DeclarationData decl : declarationData) {
             List<DeclarationDetails> declarationDetails =
@@ -75,7 +85,7 @@ public class Bootstrap implements CommandLineRunner {
                             .filter(this::detailFilter)
                             .filter(d -> d.getValue().length() > 3)
                             .filter(this::hasDotFilter)
-                            .filter(d->!d.getDescription().contains("Stawka "))
+                            //.filter(d->!d.getDescription().contains("Stawka "))
                             .filter(d->!d.getDescription().contains("Rodzaj płatnika"))
                             .collect(Collectors.toList());
             decl.setDeclarationDetails(declarationDetails);
@@ -89,7 +99,7 @@ public class Bootstrap implements CommandLineRunner {
             String tmp = d.getValue().replace(",", "");
             double val = Double.parseDouble(tmp);
 
-            return val > 0.0;
+            return val >= 0.0;
 
         } catch (Exception e) {
             return false;
