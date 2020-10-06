@@ -49,6 +49,7 @@ public class Bootstrap implements CommandLineRunner {
             CompanyData companyName = companyDataRepository.getCompanyName();
             List<CompanyData> companyData = companyDataRepository.getCompanyData();
             CompanyData companyREGON = companyDataRepository.getCompanyREGON();
+
             TransferObject transferObject = new TransferObject(
                     dbName.toLowerCase(),
                     companyName.getCompanyData(),
@@ -63,7 +64,7 @@ public class Bootstrap implements CommandLineRunner {
                 byte[] data = new ObjectMapper().writeValueAsBytes(transferObject);
 
                 try {
-                    test = (httpRequestService.sendRequest(test, data, "/synchro"));
+                    test = (httpRequestService.sendRequest(test, transferObject, "/synchro"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
