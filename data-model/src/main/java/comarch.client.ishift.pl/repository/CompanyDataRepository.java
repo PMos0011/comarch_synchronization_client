@@ -16,4 +16,8 @@ public interface CompanyDataRepository extends JpaRepository<CompanyData,Long> {
 
     @Query("from CompanyData where companyNumber = 1118")
     CompanyData getCompanyREGON();
+
+    @Query("from CompanyData where companyNumber = 3145")
+    CompanyData getCompanyIndividualTaxAccount();
+
 }

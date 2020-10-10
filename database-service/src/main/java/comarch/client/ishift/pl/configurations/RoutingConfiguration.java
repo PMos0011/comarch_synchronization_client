@@ -1,37 +1,36 @@
 package comarch.client.ishift.pl.configurations;
 
 import comarch.client.ishift.pl.data.DataBasesListSingleton;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 public class RoutingConfiguration {
 
-    private final String[] args;
-    private final DataBasesListSingleton dataBasesListSingleton;
-
-    @Autowired
-    public RoutingConfiguration(ApplicationArguments applicationArguments) throws SQLException {
-        this.args = applicationArguments.getSourceArgs();
-        dataBasesListSingleton = DataBasesListSingleton.getInstance(args[0]);
-    }
-
     @Bean
     public DataSource getDataSource()  {
 
-        Map<Object, Object> targetDataSources = new HashMap<>();
-        DataSource client0Datasource = clientADatasource("");
+        String localHostName = null;
+        try {
+            localHostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        DataBasesListSingleton dataBasesListSingleton = DataBasesListSingleton.getInstance(localHostName);
 
+        Map<Object, Object> targetDataSources = new HashMap<>();
+        DataSource client0Datasource = clientADatasource(localHostName,"");
+
+        String finalLocalHostName = localHostName;
         dataBasesListSingleton.getDatabasesList().forEach(name -> {
-            DataSource clientADatasource = clientADatasource(name);
+            DataSource clientADatasource = clientADatasource(finalLocalHostName, name);
             targetDataSources.put(name,
                     clientADatasource);
         });
@@ -43,11 +42,11 @@ public class RoutingConfiguration {
         return clientRoutingDatasource;
     }
 
-    private DataSource clientADatasource(String databaseName) {
+    private DataSource clientADatasource(String host, String databaseName) {
 
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
         dataSourceBuilder.driverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSourceBuilder.url("jdbc:sqlserver://" + args[0] + "\\OPTIMA;databaseName=" + databaseName);
+        dataSourceBuilder.url("jdbc:sqlserver://" + host + "\\OPTIMA;databaseName=" + databaseName);
         dataSourceBuilder.username("sa");
         dataSourceBuilder.password("Comarch!2011");
         return dataSourceBuilder.build();

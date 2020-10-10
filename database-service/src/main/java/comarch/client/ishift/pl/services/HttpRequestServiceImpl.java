@@ -1,7 +1,5 @@
 package comarch.client.ishift.pl.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import comarch.client.ishift.pl.model.TransferObject;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -12,23 +10,34 @@ import java.util.Optional;
 @Service
 public class HttpRequestServiceImpl implements HttpRequestService {
 
+    String authToken = null;
+
     public final static String SERVER_ADDRESS = "http://localhost:8080";
     //public final static String SERVER_ADDRESS = "https://ishift.pl:8080";
 
-    private final String AUTH_DATA_BYTE = "{\"userName\":\"mb\",\"password\":\"mbmbmbmb\"}";
+    //private final String AUTH_DATA_BYTE = "{\"userName\":\"mb\",\"password\":\"mmmm\"}";
 
 
     @Override
-    public String sendRequest(String authToken, TransferObject transferObject, String address) throws IOException {
+    public String sendRequest(String object, String address, String userName, String password) throws IOException {
+
 
         Optional<String> optionalToken = Optional.ofNullable(authToken);
 
         authToken = optionalToken.orElseGet(() -> {
             try {
+
+                String authData = "{\"userName\":\"" +
+                        userName +
+                        "\",\"password\":\"" +
+                        password +
+                        "\"}";
+
                 HttpURLConnection con = setConnection("/login", null, "POST");
-                sendData(con, AUTH_DATA_BYTE);
+                sendData(con, authData);
                 String token = getAuthorizationHeader(con, null);
                 con.disconnect();
+                System.out.println(token);
                 return token;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -36,30 +45,29 @@ public class HttpRequestServiceImpl implements HttpRequestService {
             }
         });
 
+        String clientPassword = "";
+
         if (authToken != null) {
-            String data = new ObjectMapper().writeValueAsString(transferObject);
 
             HttpURLConnection con = setConnection(address, authToken, "POST");
-            sendData(con, data);
+            sendData(con, object);
             authToken = getAuthorizationHeader(con, authToken);
-            String password = getResponse(con);
+            clientPassword = getResponse(con);
             con.disconnect();
 
-            if (!password.equals(""))
-                writeNewClientAccessData(transferObject.getRegon(), password, transferObject.getCompanyName());
-
         }
-        return authToken;
+        return clientPassword;
     }
 
     @Override
-    public String sendRequest(String token, String address) throws IOException {
-        if (token != null) {
-            HttpURLConnection con = setConnection(address, token, "GET");
-            token = getAuthorizationHeader(con, token);
+    public boolean sendRequest(String address) throws IOException {
+        if (authToken != null) {
+            HttpURLConnection con = setConnection(address, authToken, "GET");
+            authToken= getAuthorizationHeader(con, authToken);
             con.disconnect();
         }
-        return token;
+        //TODO
+        return true;
     }
 
     private HttpURLConnection setConnection(String address, String authToken, String method) throws IOException {
@@ -107,17 +115,5 @@ public class HttpRequestServiceImpl implements HttpRequestService {
         in.close();
 
         return content.toString();
-    }
-
-    public void writeNewClientAccessData(String login, String password, String fileName) throws IOException {
-        String accessData = "login: " + login +
-                " hasło: " + password;
-        fileName = System.getProperty("user.dir") + "/" + fileName + ".txt";
-
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-//        writer.write(accessData);
-//        writer.close();
-
-        System.out.println(accessData);
     }
 }
