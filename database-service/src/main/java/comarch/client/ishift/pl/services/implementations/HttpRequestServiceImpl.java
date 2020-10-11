@@ -1,5 +1,6 @@
-package comarch.client.ishift.pl.services;
+package comarch.client.ishift.pl.services.implementations;
 
+import comarch.client.ishift.pl.services.HttpRequestService;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -13,10 +14,6 @@ public class HttpRequestServiceImpl implements HttpRequestService {
     String authToken = null;
 
     public final static String SERVER_ADDRESS = "http://localhost:8080";
-    //public final static String SERVER_ADDRESS = "https://ishift.pl:8080";
-
-    //private final String AUTH_DATA_BYTE = "{\"userName\":\"mb\",\"password\":\"mmmm\"}";
-
 
     @Override
     public String sendRequest(String object, String address, String userName, String password) throws IOException {
@@ -37,7 +34,6 @@ public class HttpRequestServiceImpl implements HttpRequestService {
                 sendData(con, authData);
                 String token = getAuthorizationHeader(con, null);
                 con.disconnect();
-                System.out.println(token);
                 return token;
             } catch (IOException e) {
                 e.printStackTrace();

@@ -3,4 +3,66 @@
     <user>mb</user>
     <password>mmmm</password>
     <serverAddress/>
+    <userDataList>
+        <userDataList>
+            <login>384985580</login>
+            <password>KOzFG7Gx</password>
+            <companyName>Adam Maślej</companyName>
+            <updateDate>1602421637400</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>385660169</login>
+            <password>aOQ9hmhi</password>
+            <companyName>Artystyczna Dusza Katarzyna Domowicz</companyName>
+            <updateDate>1602421637730</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>360487569</login>
+            <password>1nbAgOjg</password>
+            <companyName>Doradztwo Finansowo-Prawne Adam Oleksyszyn</companyName>
+            <updateDate>1602421638040</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>160111356</login>
+            <password>KvYfNaQQ</password>
+            <companyName>EMILIA POLAŃSKA</companyName>
+            <updateDate>1602421638354</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>369330830</login>
+            <password>aNW6d7me</password>
+            <companyName>LA MAMMA - MONIKA MAJDA</companyName>
+            <updateDate>1602421638660</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>020573080</login>
+            <password>sKWJmwrj</password>
+            <companyName>Katarzyna Piotrowska LAB Studio</companyName>
+            <updateDate>1602421639010</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>364161592</login>
+            <password>icmjopev</password>
+            <companyName>REFKAARTJUSTYNA GÓRSKA</companyName>
+            <updateDate>1602421639331</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>360463630</login>
+            <password>9zYZboYA</password>
+            <companyName>MY WAY MICHAŁ ROCZEK</companyName>
+            <updateDate>1602421639610</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>021247141</login>
+            <password>wyYaoZyi</password>
+            <companyName>Karolina Solarska</companyName>
+            <updateDate>1602421639880</updateDate>
+        </userDataList>
+        <userDataList>
+            <login>022187702</login>
+            <password>5h8mpDmp</password>
+            <companyName>"WEGA" Wojciech Nitek</companyName>
+            <updateDate>1602421640210</updateDate>
+        </userDataList>
+    </userDataList>
 </AccountingOfficeData>

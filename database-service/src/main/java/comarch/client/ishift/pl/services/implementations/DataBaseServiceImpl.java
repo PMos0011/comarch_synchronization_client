@@ -1,4 +1,6 @@
-package comarch.client.ishift.pl.services;
+package comarch.client.ishift.pl.services.implementations;
+
+import comarch.client.ishift.pl.services.DataBaseService;
 
 import java.sql.*;
 import java.util.ArrayList;

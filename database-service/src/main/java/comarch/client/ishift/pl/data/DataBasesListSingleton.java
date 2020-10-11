@@ -1,6 +1,6 @@
 package comarch.client.ishift.pl.data;
 
-import comarch.client.ishift.pl.services.DataBaseServiceImpl;
+import comarch.client.ishift.pl.services.implementations.DataBaseServiceImpl;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
