@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/comarch.client.iml" filepath="$PROJECT_DIR$/comarch.client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/data-model/data-model.iml" filepath="$PROJECT_DIR$/data-model/data-model.iml" />
-      <module fileurl="file://$PROJECT_DIR$/database-service/database-service.iml" filepath="$PROJECT_DIR$/database-service/database-service.iml" />
     </modules>
   </component>
 </project>
