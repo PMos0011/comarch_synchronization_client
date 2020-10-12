@@ -67,7 +67,7 @@ public class DeclarationDataServiceImpl implements DeclarationDataService {
         System.out.println(new Date(date));
         System.out.println("Sprawdzam dokumenty");
 
-        Optional<List<DeclarationData>> declarationDataOptional = declarationDataRepository.findAllSupportedDeclarations(new Date(date));
+        Optional<List<DeclarationData>> declarationDataOptional = declarationDataRepository.findAllSupportedDeclarationsWithoutYearsDeclarations(new Date(date));
 
         List<DeclarationData> declarationData = declarationDataOptional.orElseThrow(() -> new RuntimeException("brak dokumentów"));
         System.out.println("zanlezione: " + declarationData.size());
