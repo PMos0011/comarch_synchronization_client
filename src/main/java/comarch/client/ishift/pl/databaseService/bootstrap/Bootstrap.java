@@ -1,5 +1,8 @@
 package comarch.client.ishift.pl.databaseService.bootstrap;
 
+import comarch.client.ishift.pl.dataModel.model.Contractor;
+import comarch.client.ishift.pl.dataModel.repository.ContractorRepository;
+import comarch.client.ishift.pl.dataModel.repository.InvoiceRepository;
 import comarch.client.ishift.pl.databaseService.accountingOfficeSettings.AccountingOfficeData;
 import comarch.client.ishift.pl.databaseService.configurations.ClientDatabaseContextHolder;
 import comarch.client.ishift.pl.databaseService.data.DataBasesListSingleton;
@@ -10,6 +13,9 @@ import comarch.client.ishift.pl.databaseService.services.XmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Component

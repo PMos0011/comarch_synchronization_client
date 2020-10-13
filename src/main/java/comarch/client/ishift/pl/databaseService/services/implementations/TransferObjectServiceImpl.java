@@ -1,12 +1,12 @@
 package comarch.client.ishift.pl.databaseService.services.implementations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import comarch.client.ishift.pl.dataModel.model.*;
+import comarch.client.ishift.pl.dataModel.repository.ContractorRepository;
+import comarch.client.ishift.pl.dataModel.repository.InvoiceRepository;
 import comarch.client.ishift.pl.databaseService.accountingOfficeSettings.AccountingOfficeData;
 import comarch.client.ishift.pl.databaseService.configurations.ClientDatabaseContextHolder;
 import comarch.client.ishift.pl.databaseService.services.HttpRequestService;
-import comarch.client.ishift.pl.dataModel.model.BankAccount;
-import comarch.client.ishift.pl.dataModel.model.CompanyData;
-import comarch.client.ishift.pl.dataModel.model.TransferObject;
 import comarch.client.ishift.pl.dataModel.repository.BankAccountRepository;
 import comarch.client.ishift.pl.dataModel.repository.CompanyDataRepository;
 import comarch.client.ishift.pl.databaseService.services.TransferObjectService;
@@ -24,16 +24,22 @@ public class TransferObjectServiceImpl implements TransferObjectService {
     private final BankAccountRepository bankAccountRepository;
     private final HttpRequestService httpRequestService;
     private final XmlService xmlService;
+    private final InvoiceRepository invoiceRepository;
+    private final ContractorRepository contractorRepository;
 
     @Autowired
     public TransferObjectServiceImpl(CompanyDataRepository companyDataRepository,
                                      BankAccountRepository bankAccountRepository,
                                      HttpRequestService httpRequestService,
-                                     XmlService xmlService) {
+                                     XmlService xmlService,
+                                     InvoiceRepository invoiceRepository,
+                                     ContractorRepository contractorRepository) {
         this.companyDataRepository = companyDataRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.httpRequestService = httpRequestService;
         this.xmlService = xmlService;
+        this.invoiceRepository = invoiceRepository;
+        this.contractorRepository = contractorRepository;
     }
 
 
@@ -53,6 +59,12 @@ public class TransferObjectServiceImpl implements TransferObjectService {
 
             List<BankAccount> bankAccounts = bankAccountRepository.getAllBankAccountsList();
 
+            List<Contractor> contractorList = contractorRepository.findAllById(
+                    invoiceRepository.getAllBuyingContractorsIdList()
+            );
+
+            List<Invoice> invoiceList = invoiceRepository.getAllSellingInvoices();
+
             TransferObject transferObject = new TransferObject(
                     dbName.toLowerCase(),
                     companyName,
@@ -60,7 +72,9 @@ public class TransferObjectServiceImpl implements TransferObjectService {
                     accountingOfficeData.getUser(),
                     companyREGON.getCompanyData(),
                     companyData,
-                    bankAccounts);
+                    bankAccounts,
+                    contractorList,
+                    invoiceList);
 
             try {
                 String newUserPassword = httpRequestService.sendRequest(
