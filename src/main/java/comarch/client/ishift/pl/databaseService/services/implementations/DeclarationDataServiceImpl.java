@@ -44,7 +44,7 @@ public class DeclarationDataServiceImpl implements DeclarationDataService {
 
             httpRequestService.sendRequest(
                     new ObjectMapper().writeValueAsString(getDeclarationData(userData.getUpdateDate())),
-                    "/synchro/documents/" + dbName.toLowerCase(),
+                    "/synchro/documents/" + dbName,
                     accountingOfficeData.getUser(),
                     accountingOfficeData.getPassword());
 

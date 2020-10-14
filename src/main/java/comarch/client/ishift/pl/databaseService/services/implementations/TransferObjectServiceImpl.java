@@ -66,7 +66,7 @@ public class TransferObjectServiceImpl implements TransferObjectService {
             List<Invoice> invoiceList = invoiceRepository.getAllSellingInvoices();
 
             TransferObject transferObject = new TransferObject(
-                    dbName.toLowerCase(),
+                    dbName,
                     companyName,
                     accountingOfficeData.getAccountingOfficeName(),
                     accountingOfficeData.getUser(),

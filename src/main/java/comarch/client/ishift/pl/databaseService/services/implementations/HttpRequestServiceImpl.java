@@ -14,32 +14,36 @@ public class HttpRequestServiceImpl implements HttpRequestService {
     String authToken = null;
 
     public final static String SERVER_ADDRESS = "http://localhost:8080";
+    //public final static String SERVER_ADDRESS = "https://ishift.pl:8080";
+
+    @Override
+    public String getAuthorization(String userName, String password) {
+
+        try {
+            String authData = "{\"userName\":\"" +
+                    userName +
+                    "\",\"password\":\"" +
+                    password +
+                    "\"}";
+
+            HttpURLConnection con = setConnection("/login", null, "POST");
+            sendData(con, authData);
+            String token = getAuthorizationHeader(con, null);
+            con.disconnect();
+            return token;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     public String sendRequest(String object, String address, String userName, String password) throws IOException {
 
-
         Optional<String> optionalToken = Optional.ofNullable(authToken);
 
-        authToken = optionalToken.orElseGet(() -> {
-            try {
-
-                String authData = "{\"userName\":\"" +
-                        userName +
-                        "\",\"password\":\"" +
-                        password +
-                        "\"}";
-
-                HttpURLConnection con = setConnection("/login", null, "POST");
-                sendData(con, authData);
-                String token = getAuthorizationHeader(con, null);
-                con.disconnect();
-                return token;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
+        authToken = optionalToken.orElseGet(() -> getAuthorization(userName, password));
 
         String clientPassword = "";
 
