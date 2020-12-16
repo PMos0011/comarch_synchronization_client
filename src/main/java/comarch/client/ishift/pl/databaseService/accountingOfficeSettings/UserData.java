@@ -1,12 +1,23 @@
 package comarch.client.ishift.pl.databaseService.accountingOfficeSettings;
 
 public class UserData {
-    String login;
-    String password;
-    String companyName;
-    Long updateDate;
+    private String login;
+    private String password;
+    private String companyName;
+    private String dbName;
+    private String serverDBName;
+    private Long updateDate;
+    private Boolean synchro;
+    private Boolean successfullySynchro;
 
     public UserData() {
+    }
+
+    public UserData(String companyName,  String dbName, Boolean synchro, Boolean successfullySynchro) {
+        this.companyName = companyName;
+        this.dbName =  dbName;
+        this.synchro = synchro;
+        this.successfullySynchro = successfullySynchro;
     }
 
     public UserData(String login, String password, String companyName, Long updateDate) {
@@ -40,11 +51,43 @@ public class UserData {
         this.companyName = companyName;
     }
 
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
+
+    public String getServerDBName() {
+        return serverDBName;
+    }
+
+    public void setServerDBName(String serverDBName) {
+        this.serverDBName = serverDBName;
+    }
+
     public Long getUpdateDate() {
         return updateDate;
     }
 
     public void setUpdateDate(Long updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Boolean getSynchro() {
+        return synchro;
+    }
+
+    public void setSynchro(Boolean synchro) {
+        this.synchro = synchro;
+    }
+
+    public Boolean getSuccessfullySynchro() {
+        return successfullySynchro;
+    }
+
+    public void setSuccessfullySynchro(Boolean successfullySynchro) {
+        this.successfullySynchro = successfullySynchro;
     }
 }

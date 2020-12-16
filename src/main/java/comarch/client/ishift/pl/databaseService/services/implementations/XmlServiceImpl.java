@@ -16,12 +16,9 @@ import java.util.Optional;
 public class XmlServiceImpl implements XmlService {
 
     @Override
-    public void addNewUser(AccountingOfficeData accountingOfficeData, String regon, String newPassword, String companyName) throws IOException {
-        accountingOfficeData.getUserDataList().add(new UserData(
-                regon,
-                newPassword,
-                companyName,
-                0L));
+    public void addNewUser(AccountingOfficeData accountingOfficeData, UserData userData) throws IOException {
+
+        accountingOfficeData.getUserDataList().add(userData);
 
         XmlService.writeAccountingOfficeSettings(accountingOfficeData);
     }

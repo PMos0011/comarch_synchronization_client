@@ -14,8 +14,8 @@ public interface CompanyDataRepository extends JpaRepository<CompanyData,Long> {
     @Query("from CompanyData where id between 169 and 186")
     List<CompanyData> getCompanyData();
 
-    @Query("from CompanyData where companyNumber = 1118")
-    CompanyData getCompanyREGON();
+    @Query("from CompanyData where id = 169")
+    CompanyData getCompanyNIP();
 
     @Query("from CompanyData where companyNumber = 3145")
     CompanyData getCompanyIndividualTaxAccount();

@@ -26,25 +26,20 @@ public class DeclarationDataServiceImpl implements DeclarationDataService {
 
     private final HttpRequestService httpRequestService;
     private final DeclarationDataRepository declarationDataRepository;
-    private final XmlService xmlService;
 
     @Autowired
     public DeclarationDataServiceImpl(HttpRequestService httpRequestService,
-                                      DeclarationDataRepository declarationDataRepository,
-                                      XmlService xmlService) {
+                                      DeclarationDataRepository declarationDataRepository) {
         this.httpRequestService = httpRequestService;
         this.declarationDataRepository = declarationDataRepository;
-        this.xmlService = xmlService;
     }
 
     @Override
-    public void sendDeclarationData(AccountingOfficeData accountingOfficeData, String companyName, String dbName) {
+    public void sendDeclarationData(AccountingOfficeData accountingOfficeData, UserData userData) {
         try {
-            UserData userData = xmlService.getUserData(accountingOfficeData,companyName);
-
             httpRequestService.sendRequest(
                     new ObjectMapper().writeValueAsString(getDeclarationData(userData.getUpdateDate())),
-                    "/synchro/documents/" + dbName,
+                    "/synchro/documents/" + userData.getServerDBName(),
                     accountingOfficeData.getUser(),
                     accountingOfficeData.getPassword());
 

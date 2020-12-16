@@ -29,7 +29,7 @@ public interface XmlService {
 
     UserData getUserData(AccountingOfficeData accountingOfficeData, String companyName);
 
-    void addNewUser(AccountingOfficeData accountingOfficeData, String regon, String newPassword, String companyName) throws IOException;
+    void addNewUser(AccountingOfficeData accountingOfficeData, UserData userData) throws IOException;
 
 
 
