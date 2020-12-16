@@ -8,13 +8,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
 
+import static comarch.client.ishift.pl.databaseService.services.XmlService.readAccountingOfficeSettings;
+
 @Service
 public class HttpRequestServiceImpl implements HttpRequestService {
 
-    String authToken = null;
+    String authToken;
+    private final String SERVER_ADDRESS;
 
-    public final static String SERVER_ADDRESS = "http://localhost:8080";
-    //public final static String SERVER_ADDRESS = "https://ishift.pl:8080";
+    public HttpRequestServiceImpl() throws IOException {
+        //todo passing address from console
+        SERVER_ADDRESS = readAccountingOfficeSettings().getServerAddress();
+        authToken = null;
+    }
 
     @Override
     public String getAuthorization(String userName, String password) {

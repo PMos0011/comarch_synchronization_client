@@ -12,7 +12,6 @@ import comarch.client.ishift.pl.dataModel.repository.BankAccountRepository;
 import comarch.client.ishift.pl.dataModel.repository.CompanyDataRepository;
 import comarch.client.ishift.pl.databaseService.services.JwtService;
 import comarch.client.ishift.pl.databaseService.services.TransferObjectService;
-import comarch.client.ishift.pl.databaseService.services.XmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,6 @@ public class TransferObjectServiceImpl implements TransferObjectService {
     private final CompanyDataRepository companyDataRepository;
     private final BankAccountRepository bankAccountRepository;
     private final HttpRequestService httpRequestService;
-    private final XmlService xmlService;
     private final InvoiceRepository invoiceRepository;
     private final ContractorRepository contractorRepository;
 
@@ -33,13 +31,11 @@ public class TransferObjectServiceImpl implements TransferObjectService {
     public TransferObjectServiceImpl(CompanyDataRepository companyDataRepository,
                                      BankAccountRepository bankAccountRepository,
                                      HttpRequestService httpRequestService,
-                                     XmlService xmlService,
                                      InvoiceRepository invoiceRepository,
                                      ContractorRepository contractorRepository) {
         this.companyDataRepository = companyDataRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.httpRequestService = httpRequestService;
-        this.xmlService = xmlService;
         this.invoiceRepository = invoiceRepository;
         this.contractorRepository = contractorRepository;
     }

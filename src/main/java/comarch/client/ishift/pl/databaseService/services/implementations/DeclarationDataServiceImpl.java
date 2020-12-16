@@ -8,7 +8,6 @@ import comarch.client.ishift.pl.dataModel.model.DeclarationData;
 import comarch.client.ishift.pl.dataModel.model.DeclarationDetails;
 import comarch.client.ishift.pl.dataModel.repository.DeclarationDataRepository;
 import comarch.client.ishift.pl.databaseService.services.DeclarationDataService;
-import comarch.client.ishift.pl.databaseService.services.XmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

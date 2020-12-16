@@ -7,6 +7,7 @@ public class AccountingOfficeData {
     String accountingOfficeName;
     String user;
     String password;
+    String serverAddress;
     String comarchServerAddress;
     String comarchServerPassword;
     List<UserData> userDataList;
@@ -38,7 +39,15 @@ public class AccountingOfficeData {
         this.password = password;
     }
 
-     public String getComarchServerAddress() {
+    public String getServerAddress() {
+        return serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
+    public String getComarchServerAddress() {
         return comarchServerAddress;
     }
 
