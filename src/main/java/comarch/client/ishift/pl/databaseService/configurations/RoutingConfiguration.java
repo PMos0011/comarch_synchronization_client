@@ -1,13 +1,14 @@
 package comarch.client.ishift.pl.databaseService.configurations;
 
+import comarch.client.ishift.pl.databaseService.accountingOfficeSettings.AccountingOfficeData;
 import comarch.client.ishift.pl.databaseService.data.DataBasesListSingleton;
+import comarch.client.ishift.pl.databaseService.services.XmlService;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,22 +16,18 @@ import java.util.Map;
 public class RoutingConfiguration {
 
     @Bean
-    public DataSource getDataSource()  {
+    public DataSource getDataSource() throws IOException {
 
-        String localHostName = null;
-        try {
-            localHostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        DataBasesListSingleton dataBasesListSingleton = DataBasesListSingleton.getInstance(localHostName);
+        //todo passing password from console
+        AccountingOfficeData accountingOfficeData = XmlService.readAccountingOfficeSettings();
+
+        DataBasesListSingleton dataBasesListSingleton = DataBasesListSingleton.getInstance(accountingOfficeData.getComarchServerAddress(), accountingOfficeData.getComarchServerPassword());
 
         Map<Object, Object> targetDataSources = new HashMap<>();
-        DataSource client0Datasource = clientADatasource(localHostName,"");
+        DataSource client0Datasource = clientADatasource(accountingOfficeData.getComarchServerAddress(),"", accountingOfficeData.getComarchServerPassword());
 
-        String finalLocalHostName = localHostName;
         dataBasesListSingleton.getDatabasesList().forEach(name -> {
-            DataSource clientADatasource = clientADatasource(finalLocalHostName, name);
+            DataSource clientADatasource = clientADatasource(accountingOfficeData.getComarchServerAddress(), name, accountingOfficeData.getComarchServerPassword());
             targetDataSources.put(name,
                     clientADatasource);
         });
@@ -42,13 +39,13 @@ public class RoutingConfiguration {
         return clientRoutingDatasource;
     }
 
-    private DataSource clientADatasource(String host, String databaseName) {
+    private DataSource clientADatasource(String host, String databaseName, String password) {
 
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
         dataSourceBuilder.driverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         dataSourceBuilder.url("jdbc:sqlserver://" + host + "\\OPTIMA;databaseName=" + databaseName);
         dataSourceBuilder.username("sa");
-        dataSourceBuilder.password("Comarch!2011");
+        dataSourceBuilder.password(password);
         return dataSourceBuilder.build();
     }
 }

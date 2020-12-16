@@ -29,7 +29,7 @@ public class Bootstrap implements CommandLineRunner {
                      DeclarationDataService declarationDataService,
                      UserDataService userDataService,
                      CompanyDataRepository companyDataRepository) {
-        this.dataBasesListSingleton = DataBasesListSingleton.getInstance(null);
+        this.dataBasesListSingleton = DataBasesListSingleton.getInstance(null, null);
         this.httpRequestService = httpRequestService;
         this.xmlService = xmlService;
         this.transferObjectService = transferObjectService;
@@ -48,10 +48,10 @@ public class Bootstrap implements CommandLineRunner {
         System.out.println("Sprawdzam dostępne bazy");
         for (String dbName : dataBasesListSingleton.getDatabasesList()) {
             ClientDatabaseContextHolder.set(dbName);
-            String companyName = companyDataRepository.getCompanyName().getCompanyData().trim();
 
-            if (xmlService.isNewUserInComarchDb(accountingOfficeData, companyName)) {
+            if (xmlService.isNewUserInComarchDb(accountingOfficeData, dbName)) {
                 System.out.println("Tworzę użytkownika");
+                String companyName = companyDataRepository.getCompanyName().getCompanyData().trim();
                 UserData userData = userDataService.createNewUserData(companyName, dbName);
                 xmlService.addNewUser(accountingOfficeData, userData);
             }

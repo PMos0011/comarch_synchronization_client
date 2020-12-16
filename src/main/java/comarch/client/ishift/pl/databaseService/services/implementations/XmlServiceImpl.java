@@ -43,11 +43,11 @@ public class XmlServiceImpl implements XmlService {
     }
 
     @Override
-    public boolean isNewUserInComarchDb(AccountingOfficeData accountingOfficeData, String companyName) {
+    public boolean isNewUserInComarchDb(AccountingOfficeData accountingOfficeData, String dbName) {
 
         return  accountingOfficeData.getUserDataList()
                 .stream()
-                .noneMatch(user -> user.getCompanyName().equals(companyName));
+                .noneMatch(user -> user.getDbName().equals(dbName));
     }
 
     @Override

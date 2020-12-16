@@ -9,10 +9,10 @@ import java.util.List;
 public class DataBaseServiceImpl implements DataBaseService {
 
     @Override
-    public List<String> getAllDatabasesNameFromServer(String databaseServer) throws SQLException {
+    public List<String> getAllDatabasesNameFromServer(String databaseServer, String SaPassword) throws SQLException {
         String databaseURL = "jdbc:sqlserver://" + databaseServer + "\\OPTIMA;";
         String username = "sa";
-        String password = "Comarch!2011";
+        String password = SaPassword;
         Connection connection = DriverManager.getConnection(databaseURL, username, password);
 
         DatabaseMetaData metadata = connection.getMetaData();

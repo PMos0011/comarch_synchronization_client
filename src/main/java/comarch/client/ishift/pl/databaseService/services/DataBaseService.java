@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface DataBaseService {
 
-    List<String> getAllDatabasesNameFromServer(String databaseServer) throws SQLException;
+    List<String> getAllDatabasesNameFromServer(String databaseServer, String password) throws SQLException;
 }

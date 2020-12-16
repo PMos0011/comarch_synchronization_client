@@ -16,10 +16,10 @@ public class DataBasesListSingleton {
         this.databasesList=databasesList;
     };
 
-    public static DataBasesListSingleton getInstance(String arg){
+    public static DataBasesListSingleton getInstance(String dbServerName, String saPassword){
         if(instance==null){
             try {
-                instance = new DataBasesListSingleton(new DataBaseServiceImpl().getAllDatabasesNameFromServer(arg));
+                instance = new DataBasesListSingleton(new DataBaseServiceImpl().getAllDatabasesNameFromServer(dbServerName,saPassword));
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }

@@ -18,7 +18,7 @@ public class UserDataServiceImpl implements UserDataService {
 
         boolean synchro = false;
 
-        System.out.println("synchronizować dane klienta " + companyName + "?");
+        System.out.println("synchronizować dane klienta " + companyName + " z bazy: " + dbName +   "?");
         System.out.println("t/n");
         int answer = reader.read();
 
