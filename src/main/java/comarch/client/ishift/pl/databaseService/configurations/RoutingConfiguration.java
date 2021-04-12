@@ -1,9 +1,9 @@
 package comarch.client.ishift.pl.databaseService.configurations;
 
+import com.zaxxer.hikari.HikariDataSource;
 import comarch.client.ishift.pl.databaseService.accountingOfficeSettings.AccountingOfficeData;
 import comarch.client.ishift.pl.databaseService.data.DataBasesListSingleton;
 import comarch.client.ishift.pl.databaseService.services.XmlService;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,13 +39,13 @@ public class RoutingConfiguration {
         return clientRoutingDatasource;
     }
 
-    private DataSource clientADatasource(String host, String databaseName, String password) {
+    private HikariDataSource clientADatasource(String host, String databaseName, String password) {
 
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSourceBuilder.url("jdbc:sqlserver://" + host + "\\OPTIMA;databaseName=" + databaseName);
-        dataSourceBuilder.username("sa");
-        dataSourceBuilder.password(password);
-        return dataSourceBuilder.build();
+        HikariDataSource dataSourceBuilder = new HikariDataSource();
+        dataSourceBuilder.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        dataSourceBuilder.setJdbcUrl("jdbc:sqlserver://" + host + "\\OPTIMA;databaseName=" + databaseName);
+        dataSourceBuilder.setUsername("sa");
+        dataSourceBuilder.setPassword(password);
+        return dataSourceBuilder;
     }
 }

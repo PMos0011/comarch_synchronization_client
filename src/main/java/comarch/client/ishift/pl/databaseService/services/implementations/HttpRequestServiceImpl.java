@@ -1,13 +1,18 @@
 package comarch.client.ishift.pl.databaseService.services.implementations;
 
+import comarch.client.ishift.pl.databaseService.bootstrap.SynchroEventList;
 import comarch.client.ishift.pl.databaseService.services.HttpRequestService;
+import comarch.client.ishift.pl.gui.MainWindow;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
 
+import static comarch.client.ishift.pl.databaseService.bootstrap.SynchroEventList.synchroEventList;
 import static comarch.client.ishift.pl.databaseService.services.XmlService.readAccountingOfficeSettings;
 
 @Service
@@ -23,9 +28,8 @@ public class HttpRequestServiceImpl implements HttpRequestService {
     }
 
     @Override
-    public String getAuthorization(String userName, String password) {
+    public String getAuthorization(String userName, String password) throws IOException {
 
-        try {
             String authData = "{\"userName\":\"" +
                     userName +
                     "\",\"password\":\"" +
@@ -36,12 +40,11 @@ public class HttpRequestServiceImpl implements HttpRequestService {
             sendData(con, authData);
             String token = getAuthorizationHeader(con, null);
             con.disconnect();
+            if (token == null) {
+                System.out.println("Bład autoryzacji");
+                throw new IOException();
+            }
             return token;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @Override
@@ -49,12 +52,12 @@ public class HttpRequestServiceImpl implements HttpRequestService {
 
         Optional<String> optionalToken = Optional.ofNullable(authToken);
 
-        authToken = optionalToken.orElseGet(() -> getAuthorization(userName, password));
-
+        if(authToken == null){
+            authToken = getAuthorization(userName, password);
+        }
         String clientPassword = "";
 
         if (authToken != null) {
-
             HttpURLConnection con = setConnection(address, authToken, "POST");
             sendData(con, object);
             authToken = getAuthorizationHeader(con, authToken);
@@ -69,7 +72,7 @@ public class HttpRequestServiceImpl implements HttpRequestService {
     public boolean sendRequest(String address) throws IOException {
         if (authToken != null) {
             HttpURLConnection con = setConnection(address, authToken, "GET");
-            authToken= getAuthorizationHeader(con, authToken);
+            authToken = getAuthorizationHeader(con, authToken);
             con.disconnect();
         }
         //TODO
@@ -91,11 +94,13 @@ public class HttpRequestServiceImpl implements HttpRequestService {
         return con;
     }
 
-    private void sendData(HttpURLConnection con, String data) throws IOException {
+    private void sendData(HttpURLConnection con, String data){
         byte[] dataByteArray = data.getBytes();
 
         try (OutputStream os = con.getOutputStream()) {
             os.write(dataByteArray, 0, dataByteArray.length);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -107,7 +112,7 @@ public class HttpRequestServiceImpl implements HttpRequestService {
                 || con.getResponseCode() == HttpURLConnection.HTTP_OK)
             return token;
         else
-            return null;
+            throw new IOException();
     }
 
     private String getResponse(HttpURLConnection con) throws IOException {

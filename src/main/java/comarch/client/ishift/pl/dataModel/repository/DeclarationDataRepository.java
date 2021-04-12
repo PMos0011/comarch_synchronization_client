@@ -14,7 +14,7 @@ public interface DeclarationDataRepository  extends JpaRepository<DeclarationDat
     @Query("from DeclarationData where finalna = 1 and typDeklaracji < 21 and typDeklaracji <> 11 and modDate >= ?1" )
     Optional<List<DeclarationData>> findAllSupportedDeclarations(Date lastTransferDate);
 
-    @Query("from DeclarationData where finalna = 1 and typDeklaracji < 15 and typDeklaracji <> 11 and modDate >= ?1" )
+    @Query("from DeclarationData where finalna = 1 and typDeklaracji < 15 and typDeklaracji <> 11 and modDate >= ?1 and statusCode = 200")
     Optional<List<DeclarationData>> findAllSupportedDeclarationsWithoutYearsDeclarations(Date lastTransferDate);
     
 }

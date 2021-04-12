@@ -33,6 +33,9 @@ public class DeclarationData {
     @Column(name = "DkN_Wersja")
     private Integer version;
 
+    @Column(name = "DkN_EDekl_Status")
+    private Integer statusCode;
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "DkW_DkNID", updatable = false, insertable = false)
     List<DeclarationDetails> declarationDetails;
@@ -107,5 +110,13 @@ public class DeclarationData {
 
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
     }
 }

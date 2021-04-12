@@ -12,6 +12,7 @@ import comarch.client.ishift.pl.dataModel.repository.BankAccountRepository;
 import comarch.client.ishift.pl.dataModel.repository.CompanyDataRepository;
 import comarch.client.ishift.pl.databaseService.services.JwtService;
 import comarch.client.ishift.pl.databaseService.services.TransferObjectService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,56 +43,55 @@ public class TransferObjectServiceImpl implements TransferObjectService {
 
 
     @Override
-    public String sendTransferObject(AccountingOfficeData accountingOfficeData, UserData userData) {
+    public String sendTransferObject(AccountingOfficeData accountingOfficeData, UserData userData) throws IOException {
 
         //todo  null exception
         String token = httpRequestService.getAuthorization(accountingOfficeData.getUser(), accountingOfficeData.getPassword());
         String dbId = JwtService.getDbIDFromToken(token);
 
-            CompanyData companyNIP = companyDataRepository.getCompanyNIP();
-            List<CompanyData> companyData = companyDataRepository.getCompanyData();
+        CompanyData companyNIP = companyDataRepository.getCompanyNIP();
+        List<CompanyData> companyData = companyDataRepository.getCompanyData();
 
-            companyData.add(companyDataRepository.getCompanyIndividualTaxAccount());
+        companyData.add(companyDataRepository.getCompanyIndividualTaxAccount());
 
-            List<BankAccount> bankAccounts = bankAccountRepository.getAllBankAccountsList();
+        List<BankAccount> bankAccounts = bankAccountRepository.getAllBankAccountsList();
 
-            List<Contractor> contractorList = contractorRepository.findAllById(
-                    invoiceRepository.getAllBuyingContractorsIdList()
-            );
+        List<Contractor> contractorList = contractorRepository.findAllById(
+                invoiceRepository.getAllBuyingContractorsIdList()
+        );
 
-            List<Invoice> invoiceList = invoiceRepository.getAllSellingInvoices();
-            String serverDBName = createDbName(userData.getDbName(), dbId);
+        List<Invoice> invoiceList = invoiceRepository.getAllSellingInvoices();
+        String serverDBName = createDbName(userData.getDbName(), dbId);
 
-            TransferObject transferObject = new TransferObject(
-                    serverDBName,
-                    userData.getCompanyName(),
-                    accountingOfficeData.getAccountingOfficeName(),
+        String userLogin = companyNIP.getCompanyData() + "_" + RandomStringUtils.randomAlphanumeric(4);
+        TransferObject transferObject = new TransferObject(
+                serverDBName,
+                userData.getCompanyName(),
+                accountingOfficeData.getAccountingOfficeName(),
+                accountingOfficeData.getUser(),
+                userLogin,
+                companyData,
+                bankAccounts,
+                contractorList,
+                invoiceList);
+
+        try {
+            String newUserPassword = httpRequestService.sendRequest(
+                    new ObjectMapper().writeValueAsString(transferObject),
+                    "/synchro/transferObject",
                     accountingOfficeData.getUser(),
-                    companyNIP.getCompanyData(),
-                    companyData,
-                    bankAccounts,
-                    contractorList,
-                    invoiceList);
+                    accountingOfficeData.getPassword());
 
-            try {
-                String newUserPassword = httpRequestService.sendRequest(
-                        new ObjectMapper().writeValueAsString(transferObject),
-                        "/synchro/transferObject",
-                        accountingOfficeData.getUser(),
-                        accountingOfficeData.getPassword());
+            userData.setLogin(userLogin);
+            userData.setPassword(newUserPassword);
+            userData.setServerDBName(serverDBName);
+            userData.setSuccessfullySynchro(true);
 
-                userData.setLogin(companyNIP.getCompanyData());
-                userData.setPassword(newUserPassword);
-                userData.setServerDBName(serverDBName);
-                userData.setSuccessfullySynchro(true);
-                userData.setUpdateDate(0L);
-
-
-            } catch (IOException e) {
-                //TODO
-                ClientDatabaseContextHolder.clear();
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            //TODO
+            ClientDatabaseContextHolder.clear();
+            e.printStackTrace();
+        }
 
         return "companyName";
     }

@@ -7,6 +7,7 @@ public class UserData {
     private String dbName;
     private String serverDBName;
     private Long updateDate;
+    private Long jpkFileId;
     private Boolean synchro;
     private Boolean successfullySynchro;
 
@@ -18,13 +19,9 @@ public class UserData {
         this.dbName =  dbName;
         this.synchro = synchro;
         this.successfullySynchro = successfullySynchro;
-    }
 
-    public UserData(String login, String password, String companyName, Long updateDate) {
-        this.login = login;
-        this.password = password;
-        this.companyName = companyName;
-        this.updateDate = updateDate;
+        this.updateDate = 0L;
+        this.jpkFileId = 0L;
     }
 
     public String getLogin() {
@@ -89,5 +86,13 @@ public class UserData {
 
     public void setSuccessfullySynchro(Boolean successfullySynchro) {
         this.successfullySynchro = successfullySynchro;
+    }
+
+    public void setJpkFileId(Long jpkFileId) {
+        this.jpkFileId = jpkFileId;
+    }
+
+    public Long getJpkFileId() {
+        return jpkFileId;
     }
 }

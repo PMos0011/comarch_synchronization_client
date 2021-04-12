@@ -14,17 +14,7 @@ public class UserDataServiceImpl implements UserDataService {
     @Override
     public UserData createNewUserData(String companyName, String dbName) throws IOException {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-        boolean synchro = false;
-
-        System.out.println("synchronizować dane klienta " + companyName + " z bazy: " + dbName +   "?");
-        System.out.println("t/n");
-        int answer = reader.read();
-
-        if(answer==116)
-            synchro=true;
-
-        return new UserData(companyName, dbName,synchro, false);
+        //System.out.println("synchronizować dane klienta " + companyName + " z bazy: " + dbName +   "?");
+        return new UserData(companyName, dbName,false, false);
     }
 }

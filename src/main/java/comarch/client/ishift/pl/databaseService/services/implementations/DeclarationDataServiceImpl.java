@@ -1,8 +1,12 @@
 package comarch.client.ishift.pl.databaseService.services.implementations;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import comarch.client.ishift.pl.dataModel.model.JPKFiles;
+import comarch.client.ishift.pl.dataModel.repository.JPKFilesRepository;
 import comarch.client.ishift.pl.databaseService.accountingOfficeSettings.AccountingOfficeData;
 import comarch.client.ishift.pl.databaseService.accountingOfficeSettings.UserData;
+import comarch.client.ishift.pl.databaseService.bootstrap.SynchroEventList;
 import comarch.client.ishift.pl.databaseService.services.HttpRequestService;
 import comarch.client.ishift.pl.dataModel.model.DeclarationData;
 import comarch.client.ishift.pl.dataModel.model.DeclarationDetails;
@@ -13,70 +17,73 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static comarch.client.ishift.pl.databaseService.services.XmlService.writeAccountingOfficeSettings;
+import static comarch.client.ishift.pl.databaseService.bootstrap.SynchroEventList.synchroEventList;
 
 @Service
 public class DeclarationDataServiceImpl implements DeclarationDataService {
 
     private final HttpRequestService httpRequestService;
     private final DeclarationDataRepository declarationDataRepository;
+    private final JPKFilesRepository jpkFilesRepository;
 
     @Autowired
     public DeclarationDataServiceImpl(HttpRequestService httpRequestService,
-                                      DeclarationDataRepository declarationDataRepository) {
+                                      DeclarationDataRepository declarationDataRepository,
+                                      JPKFilesRepository jpkFilesRepository) {
         this.httpRequestService = httpRequestService;
         this.declarationDataRepository = declarationDataRepository;
+        this.jpkFilesRepository = jpkFilesRepository;
     }
 
     @Override
-    public void sendDeclarationData(AccountingOfficeData accountingOfficeData, UserData userData) {
-        try {
-            httpRequestService.sendRequest(
-                    new ObjectMapper().writeValueAsString(getDeclarationData(userData.getUpdateDate())),
-                    "/synchro/documents/" + userData.getServerDBName(),
-                    accountingOfficeData.getUser(),
-                    accountingOfficeData.getPassword());
-
-            userData.setUpdateDate(
-                    new Timestamp(System.currentTimeMillis()).getTime()
-            );
-
-            writeAccountingOfficeSettings(accountingOfficeData);
-
-
-        } catch (IOException e) {
-            System.out.println("bład konwersji");
-        } catch (RuntimeException e) {
-            System.out.println(e.toString());
-        }
+    public void sendDeclarationData(AccountingOfficeData accountingOfficeData, UserData userData) throws IOException {
+                httpRequestService.sendRequest(
+                        new ObjectMapper().writeValueAsString(getDeclarationData(userData)),
+                        "/synchro/documents/" + userData.getServerDBName(),
+                        accountingOfficeData.getUser(),
+                        accountingOfficeData.getPassword());
     }
 
-    private List<DeclarationData> getDeclarationData(Long date) {
+    private List<DeclarationData> getDeclarationData(UserData userData) {
 
-        System.out.println(new Date(date));
         System.out.println("Sprawdzam dokumenty");
+        List<DeclarationData> declarationData = declarationDataRepository
+                .findAllSupportedDeclarationsWithoutYearsDeclarations(new Date(userData.getUpdateDate())).orElse(new ArrayList<>());
 
-        Optional<List<DeclarationData>> declarationDataOptional = declarationDataRepository.findAllSupportedDeclarationsWithoutYearsDeclarations(new Date(date));
+        userData.setUpdateDate(
+                new Timestamp(System.currentTimeMillis()).getTime()
+        );
 
-        List<DeclarationData> declarationData = declarationDataOptional.orElseThrow(() -> new RuntimeException("brak dokumentów"));
-        System.out.println("zanlezione: " + declarationData.size());
+        Optional<List<JPKFiles>> jpkDeclarationOptional = jpkFilesRepository.findAllSendDeclarations(userData.getJpkFileId());
 
-        for (DeclarationData decl : declarationData) {
-            List<DeclarationDetails> declarationDetails =
-                    decl.getDeclarationDetails().stream()
-                            .filter(this::detailFilter)
-                            .filter(d -> d.getValue().length() > 3)
-                            .filter(this::hasDotFilter)
-                            .filter(d -> !d.getDescription().contains("Rodzaj płatnika"))
-                            .collect(Collectors.toList());
-            decl.setDeclarationDetails(declarationDetails);
+        jpkDeclarationOptional.ifPresent(jpkFiles -> {
+            jpkFiles.forEach(file -> declarationData.add(file.getDeclarationData()));
+            userData.setJpkFileId(jpkFiles.get(jpkFiles.size() - 1).getId());
+        });
+
+        if (declarationData.size() > 0) {
+            System.out.println("zanlezione: " + declarationData.size());
+            synchroEventList.add("znalazłem: " + declarationData.size());
+
+            for (DeclarationData decl : declarationData) {
+                List<DeclarationDetails> declarationDetails =
+                        decl.getDeclarationDetails().stream()
+                                .filter(this::detailFilter)
+                                .filter(d -> d.getValue().length() > 3)
+                                .filter(this::hasDotFilter)
+                                .filter(d -> !d.getDescription().contains("Rodzaj płatnika"))
+                                .collect(Collectors.toList());
+                decl.setDeclarationDetails(declarationDetails);
+            }
+            return declarationData;
         }
-        return declarationData;
+        throw new RuntimeException("brak dokumentów");
     }
 
     private boolean detailFilter(DeclarationDetails d) {

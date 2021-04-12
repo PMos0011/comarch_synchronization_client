@@ -14,7 +14,6 @@ public class DataBaseServiceImpl implements DataBaseService {
         String username = "sa";
         String password = SaPassword;
         Connection connection = DriverManager.getConnection(databaseURL, username, password);
-
         DatabaseMetaData metadata = connection.getMetaData();
         ResultSet result = metadata.getCatalogs();
 

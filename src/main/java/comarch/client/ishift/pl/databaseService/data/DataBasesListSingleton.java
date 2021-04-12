@@ -1,8 +1,10 @@
 package comarch.client.ishift.pl.databaseService.data;
 
 import comarch.client.ishift.pl.databaseService.services.implementations.DataBaseServiceImpl;
+import comarch.client.ishift.pl.gui.MainWindow;
 import org.springframework.stereotype.Component;
 
+import javax.swing.*;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -21,6 +23,11 @@ public class DataBasesListSingleton {
             try {
                 instance = new DataBasesListSingleton(new DataBaseServiceImpl().getAllDatabasesNameFromServer(dbServerName,saPassword));
             } catch (SQLException throwables) {
+                JOptionPane.showMessageDialog(null,
+                        "Błąd z połączeniem bazą Comarch",
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE);
+                MainWindow.getMainWindow().getContentLayout().showError();
                 throwables.printStackTrace();
             }
         }
